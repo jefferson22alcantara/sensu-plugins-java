@@ -18,7 +18,7 @@
 
 # Also make sure the user "sensu" can sudo jps and jstat without password
 
-while getopts 'w:c:n:o:j:l:hp' OPT; do
+while getopts 'w:c:n:o:j:l:a:hp:' OPT; do
   case $OPT in
     w)  WARN=$OPTARG;;
     c)  CRIT=$OPTARG;;
@@ -26,6 +26,7 @@ while getopts 'w:c:n:o:j:l:hp' OPT; do
     o)  OPTIONS=$OPTARG;;
     j)  JAVA_BIN=$OPTARG;;
     l)  HEAP_MAX=$OPTARG;;
+    a)  ALL_NAMES=$OPTARG;;
     h)  hlp="yes";;
     p)  perform="yes";;
     *)  unknown="yes";;
@@ -35,6 +36,7 @@ done
 # usage
 HELP="
 usage: $0 [ -n value -w value -c value -o value -l value -p -h ]
+  -a --> All of JVM process < value
   -n --> Name of JVM process < value
   -w --> Warning Percentage < value
   -c --> Critical Percentage < value
@@ -45,7 +47,6 @@ usage: $0 [ -n value -w value -c value -o value -l value -p -h ]
   -l --> limit, valid value max or current (default current)
          current: when -Xms and -Xmx same value
          max: when -Xms and -Xmx have different values
-
 Requirement: User that launch script must be permisions in sudoers for jps,jstat,jmap
 sudoers lines suggested:
 ----------
@@ -62,10 +63,16 @@ fi
 WARN=${WARN:=0}
 CRIT=${CRIT:=0}
 NAME=${NAME:=0}
+ALL=${ALL_NAMES:=0}
 JAVA_BIN=${JAVA_BIN:=""}
 
 #Get PID of JVM.
 #At this point grep for the name of the java process running your jvm.
+
+
+function check_java_heap()
+{
+NAME=$1
 PID=$(sudo ${JAVA_BIN}jps $OPTIONS | grep " $NAME$" | awk '{ print $1}')
 COUNT=$(echo $PID | wc -w)
 if [ $COUNT != 1 ]; then
@@ -122,4 +129,16 @@ elif (( $HeapPer >= $WARN )); then
 else
   echo "MEM OK - $output"
   exit 0
+fi
+}
+
+
+if [ $ALL == "yes" ]; then
+    java_process_names=$(sudo ${JAVA_BIN}jps $OPTIONS | grep ".jar" | awk '{ print $2}')
+    for pname in ${java_process_names}
+   {
+        check_java_heap $pname
+    }
+else
+    check_java_heap $NAME
 fi

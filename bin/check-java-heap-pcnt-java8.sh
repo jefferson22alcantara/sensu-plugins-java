@@ -15,7 +15,7 @@
 # Also make sure the user "sensu" can sudo without password
 
 # #RED
-while getopts 'w:c:n:o:j:l:hp' OPT; do
+while getopts 'w:c:n:o:j:l:a:hp' OPT; do
   case $OPT in
     w)  WARN=$OPTARG;;
     c)  CRIT=$OPTARG;;
@@ -23,6 +23,7 @@ while getopts 'w:c:n:o:j:l:hp' OPT; do
     o)  OPTIONS=$OPTARG;;
     j)  JAVA_BIN=$OPTARG;;
     l)  HEAP_MAX=$OPTARG;;
+    a)  ALL_NAMES=$OPTARG;;
     h)  hlp="yes";;
     p)  perform="yes";;
     *)  unknown="yes";;
@@ -33,6 +34,7 @@ done
 # usage
 HELP="
     usage: $0 [ -n value -w value -c value -o value -l value -p -h ]
+        -a --> All of JVM process < value
         -n --> Name of JVM process < value
         -w --> Warning Percentage < value
         -c --> Critical Percentage < value
@@ -61,7 +63,13 @@ WARN=${WARN:=0}
 CRIT=${CRIT:=0}
 NAME=${NAME:=0}
 JAVA_BIN=${JAVA_BIN:=""}
+ALL=${ALL_NAMES:=0}
 
+
+
+function check_java_heap()
+{
+NAME=$1
 #Get PIDs of JVM.
 #At this point grep for the names of the java processes running your jvm.
 PIDS=$(sudo ${JAVA_BIN}jps $OPTIONS | grep " $NAME$" | awk '{ print $1}')
@@ -122,4 +130,19 @@ if (($projectSize -ne $1 && ${codes[0]} != "0")); then
 	exit ${codes[1]}
 else
 	exit ${codes[0]}
+fi
+
+
+} 
+
+
+
+if [ $ALL == "yes" ]; then
+    java_process_names=$(sudo ${JAVA_BIN}jps $OPTIONS | grep ".jar" | awk '{ print $2}')
+    for pname in ${java_process_names}
+   {
+        check_java_heap $pname
+    }
+else
+    check_java_heap $NAME
 fi

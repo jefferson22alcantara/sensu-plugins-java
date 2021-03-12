@@ -16,17 +16,20 @@
 
 # Also make sure the user "sensu" can sudo jps and jstat without password
 
-while getopts 's:n:h' OPT; do
+while getopts 's:n:h:a' OPT; do
   case $OPT in
+
     s) SCHEME=$OPTARG;;
     n) NAME=$OPTARG;;
     h) hlp="yes";;
+    a) ALL_NAMES=$OPTARG;;
   esac
 done
 
 #usage
 HELP="
 usage $0 [ -n value -s value -h ]
+-a --> All of JVM process < value
 -n --> NAME or name of jvm process < value
 -s --> SCHEME or server name ex. :::name::: < value
 -h --> print this help screen
@@ -39,12 +42,20 @@ fi
 SCHEME=${SCHEME:=0}
 NAME=${NAME:=0}
 JAVA_BIN=${JAVA_BIN:=""}
+ALL=${ALL_NAMES:=0}
 
+
+
+
+function check_java_heap() 
+{
+
+NAME=$1 
 #Get PID of JVM.
 #At this point grep for the name of the java process running your jvm.
 PIDS=$(sudo ${JAVA_BIN}jps $OPTIONS | grep " $NAME$" | awk '{ print $1 }')
 COUNT=$(echo $PID | wc -w)
-for PID in $PIDS
+for PID in $PID
 do
 
   project=$(sudo jps | grep $PID | awk '{ print $2 }' | cut -d. -f1)
@@ -102,3 +113,14 @@ do
   echo "JVMs.$SCHEME.$project.Old_Util $OldGen `date '+%s'`"
 
 done
+}
+
+if [ $ALL == "yes" ]; then
+    java_process_names=$(sudo ${JAVA_BIN}jps $OPTIONS | grep ".jar" | awk '{ print $2}')
+    for pname in ${java_process_names}
+   {
+        check_java_heap $pname
+    }
+else
+    check_java_heap $NAME
+fi

@@ -13,16 +13,18 @@
 # Also make sure the user "sensu" can sudo without password
 
 # #RED
-while getopts 's:n:h' OPT; do
+while getopts 's:n:h:a:' OPT; do
 case $OPT in
 s) SCHEME=$OPTARG;;
 n) NAME=$OPTARG;;
 h) hlp="yes";;
+a) ALL_NAMES=$OPTARG;;
 esac
 done
 #usage
 HELP="
         usage $0 [ -n value -s value -h ]
+                -a --> All of JVM process < value
                 -n --> NAME or name of jvm process < value
 		-s --> SCHEME or server name ex. :::name::: < value
                 -h --> print this help screen
@@ -34,11 +36,16 @@ if [ "$hlp" = "yes" ]; then
 
 SCHEME=${SCHEME:=0}
 NAME=${NAME:=0}
+ALL=${ALL_NAMES:=0}
 
+function check_java_heap() 
+{
+
+NAME=$1 
 #Get PIDs of JVM.
 #At this point grep for the names of the java processes running your jvm.
 PID=$(sudo jps | grep " $NAME$" | awk '{ print $1}')
-for PID in $PIDS
+for PID in $PID
 do
   #Get max heap capacity of JVM
   MaxHeap=$(sudo jmap -heap $PID 2> /dev/null | grep MaxHeapSize | tr -s " " | tail -n1 | awk '{ print $3 /1024 /1024 }')
@@ -73,3 +80,14 @@ do
   echo "JVMs.$SCHEME.$project.Survivor_Util $ParSurv `date '+%s'`"
   echo "JVMs.$SCHEME.$project.Old_Util $OldGen `date '+%s'`"
 done
+}
+
+if [ $ALL == "yes" ]; then
+    java_process_names=$(sudo ${JAVA_BIN}jps $OPTIONS | grep ".jar" | awk '{ print $2}')
+    for pname in "${java_process_names}"
+   {
+        check_java_heap $pname
+    }
+else
+    check_java_heap $NAME
+fi

@@ -15,12 +15,13 @@
 # Also make sure the user "sensu" can sudo without password
 
 # #RED
-while getopts 'w:c:n:l:hp' OPT; do
+while getopts 'w:c:n:l:a:hp' OPT; do
   case $OPT in
     w)  WARN=$OPTARG;;
     c)  CRIT=$OPTARG;;
     n)  NAME=$OPTARG;;
     l)  HEAP_MAX=$OPTARG;;
+    a)  ALL_NAMES=$OPTARG;;
     h)  hlp="yes";;
     p)  perform="yes";;
     *)  unknown="yes";;
@@ -30,7 +31,7 @@ done
 # usage
 HELP="
     usage: $0 [ -n value -w value -c value -p -h ]
-
+        -a --> All of JVM process < value
         -n --> Name of JVM process < value
         -w --> Warning Percentage < value
         -c --> Critical Percentage < value
@@ -56,7 +57,14 @@ fi
 WARN=${WARN:=0}
 CRIT=${CRIT:=0}
 NAME=${NAME:=0}
+ALL=${ALL_NAMES:=0}
 
+
+
+function check_java_heap() 
+{
+
+NAME=$1 
 #Get PID of JVM.
 #At this point grep for the name of the java process running your jvm.
 PID=$(sudo jps | grep " $NAME$" | awk '{ print $1}')
@@ -102,4 +110,17 @@ elif (( $HeapPer >= $WARN )); then
 else
   echo "MEM OK - $output"
   exit 0
+fi
+} 
+
+
+
+if [ $ALL == "yes" ]; then
+    java_process_names=$(sudo ${JAVA_BIN}jps $OPTIONS | grep ".jar" | awk '{ print $2}')
+    for pname in ${java_process_names}
+   {
+        check_java_heap $pname
+    }
+else
+    check_java_heap $NAME
 fi

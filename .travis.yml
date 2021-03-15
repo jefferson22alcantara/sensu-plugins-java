@@ -5,17 +5,30 @@ install:
 - bundle install
 rvm:
 - 2.4.1
+- 2.3.0 
 script:
 - bundle exec rake default
 - gem build sensu-plugins-java.gemspec
 - gem install sensu-plugins-java-*.gem
 before_deploy:
-  - bash -c "[ ! -d bonsai/ ] && git clone https://github.com/sensu/sensu-go-bonsai-asset.git bonsai || echo 'bonsai/ exists, skipping git clone'"
+- bash -c "[ ! -d bonsai/ ] && git clone https://github.com/sensu/sensu-go-bonsai-asset.git
+  bonsai || echo 'bonsai/ exists, skipping git clone'"
 deploy:
-  provider: script
+- provider: script
   script: bonsai/ruby-runtime/travis-build-ruby-plugin-assets.sh sensu-plugins-java
   skip_cleanup: true
   on:
     tags: true
     all_branches: true
     rvm: 2.4.1
+- provider: rubygems
+  api_key:
+    secure: q0SSDKlIC42IAehSMFkN4HpmAnC8u+IJ+9/ytppJisAnXxKk9/ZJeNSBvOMiMYzlW5PDBl7IW/2fkXYvXrHnDpqNdXsOQ1eytbRvrWQm7KySB8ToING7XKvsZjcT53hBolNlL2WyeYAf2c4BvbuMNmc1bex+kv3eLLYmib546fJjaIQhjtwhUSx5g8TLVluj0L/cdQDMWT+O4K5Zu/mTxhCG4HQ0K/ywaLmhagUBQEjHDVq/L9BftU4NTmiF9/jAthVcl0MFRwUw1F6E88XGaRkjitS0ykw8JQ8GZGi2s4klsTOP9IS6/5gfMzcBMmoMVKiyOqCgnpJqAuGyWO6MWNuLyeW5HD9AKSKAzt1/fdfMQTcIjL/a+SHos7ZVB4BMXu6AP4KmHbyAK3lFvZBdvxset/gV3ovaGxOU2856Y4nr1o6/IkqkOmj2023KlWxzY/BjVyYV9F+iE/c9b72lu6Lst1I53b/FvvhzV7qf4KC1jGDxH3YYJIGgAhKi6SEwdt/n8hc6dlSuv5/85KWt2Zs0ogaVc/OoeaqTJnp3R2wG4DBomOxBA9bnfF9UvpMu8VO5rKrp8k7T1bvqVvp86yE1tIdBwNHa24SbT/z41WHymcH4/JbfGuAsenbLEzdQxO0TM6UJ0al7Wc0fCFwoQB+s1R9x1YhMoa15ny+aZjw=
+  gem: sensu-plugins-java
+  on:
+    tags: true
+    repo: jefferson22alcantara/sensu-plugins-java
+    branch: all-options
+    rvm: 2.4.1
+    all_branches: true
+  skip_cleanup: 'true'

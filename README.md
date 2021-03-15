@@ -1,11 +1,11 @@
 ## Sensu-Plugins-java
 
-[![Build Status](https://travis-ci.org/sensu-plugins/sensu-plugins-java.svg?branch=master)](https://travis-ci.org/sensu-plugins/sensu-plugins-java)
+[![Build Status](https://travis-ci.com/jefferson22alcantara/sensu-plugins-java.svg?branch=master)](https://travis-ci.org/sensu-plugins/sensu-plugins-java)
 [![Gem Version](https://badge.fury.io/rb/sensu-plugins-java.svg)](http://badge.fury.io/rb/sensu-plugins-java)
 [![Code Climate](https://codeclimate.com/github/sensu-plugins/sensu-plugins-java/badges/gpa.svg)](https://codeclimate.com/github/sensu-plugins/sensu-plugins-java)
 [![Test Coverage](https://codeclimate.com/github/sensu-plugins/sensu-plugins-java/badges/coverage.svg)](https://codeclimate.com/github/sensu-plugins/sensu-plugins-java)
 [![Dependency Status](https://gemnasium.com/sensu-plugins/sensu-plugins-java.svg)](https://gemnasium.com/sensu-plugins/sensu-plugins-java)
-[![Sensu Bonsai Asset](https://img.shields.io/badge/Bonsai-Download%20Me-brightgreen.svg?colorB=89C967&logo=sensu)](https://bonsai.sensu.io/assets/ivoamorim/sensu-plugins-java)
+[![Sensu Bonsai Asset](https://img.shields.io/badge/Bonsai-Download%20Me-brightgreen.svg?colorB=89C967&logo=sensu)](https://bonsai.sensu.io/assets/jefferson22alcantara/sensu-plugins-java)
 
 ## Functionality
 

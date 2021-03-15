@@ -1,11 +1,13 @@
 language: ruby
+env:
+  global:
+    - GITHUB_TOKEN=$GITHUB_TOKEN
 cache:
 - bundler
 install:
 - bundle install
 rvm:
 - 2.4.1
-- 2.3.0 
 script:
 - bundle exec rake default
 - gem build sensu-plugins-java.gemspec
@@ -21,6 +23,16 @@ deploy:
     tags: true
     all_branches: true
     rvm: 2.4.1
+
+- provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  keep_history: true
+  on:
+    tags: true
+    all_branches: true
+
+
 - provider: rubygems
   api_key:
     secure: q0SSDKlIC42IAehSMFkN4HpmAnC8u+IJ+9/ytppJisAnXxKk9/ZJeNSBvOMiMYzlW5PDBl7IW/2fkXYvXrHnDpqNdXsOQ1eytbRvrWQm7KySB8ToING7XKvsZjcT53hBolNlL2WyeYAf2c4BvbuMNmc1bex+kv3eLLYmib546fJjaIQhjtwhUSx5g8TLVluj0L/cdQDMWT+O4K5Zu/mTxhCG4HQ0K/ywaLmhagUBQEjHDVq/L9BftU4NTmiF9/jAthVcl0MFRwUw1F6E88XGaRkjitS0ykw8JQ8GZGi2s4klsTOP9IS6/5gfMzcBMmoMVKiyOqCgnpJqAuGyWO6MWNuLyeW5HD9AKSKAzt1/fdfMQTcIjL/a+SHos7ZVB4BMXu6AP4KmHbyAK3lFvZBdvxset/gV3ovaGxOU2856Y4nr1o6/IkqkOmj2023KlWxzY/BjVyYV9F+iE/c9b72lu6Lst1I53b/FvvhzV7qf4KC1jGDxH3YYJIGgAhKi6SEwdt/n8hc6dlSuv5/85KWt2Zs0ogaVc/OoeaqTJnp3R2wG4DBomOxBA9bnfF9UvpMu8VO5rKrp8k7T1bvqVvp86yE1tIdBwNHa24SbT/z41WHymcH4/JbfGuAsenbLEzdQxO0TM6UJ0al7Wc0fCFwoQB+s1R9x1YhMoa15ny+aZjw=

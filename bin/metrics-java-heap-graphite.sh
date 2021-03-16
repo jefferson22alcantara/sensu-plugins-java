@@ -16,7 +16,7 @@
 
 # Also make sure the user "sensu" can sudo jps and jstat without password
 
-while getopts 's:n:h:a' OPT; do
+while getopts 's:n:h:a:' OPT; do
   case $OPT in
 
     s) SCHEME=$OPTARG;;
@@ -47,15 +47,15 @@ ALL=${ALL_NAMES:=0}
 
 
 
-function check_java_heap() 
+function check_java_heap()
 {
 
-NAME=$1 
+NAME=$1
 #Get PID of JVM.
 #At this point grep for the name of the java process running your jvm.
-PIDS=$(sudo ${JAVA_BIN}jps $OPTIONS | grep " $NAME$" | awk '{ print $1 }')
+PIDS=$(sudo ${JAVA_BIN}jps $OPTIONS | grep "$NAME" | awk '{ print $1 }')
 COUNT=$(echo $PID | wc -w)
-for PID in $PID
+for PID in $PIDS
 do
 
   project=$(sudo jps | grep $PID | awk '{ print $2 }' | cut -d. -f1)
@@ -116,7 +116,7 @@ done
 }
 
 if [ $ALL == "yes" ]; then
-    java_process_names=$(sudo ${JAVA_BIN}jps $OPTIONS | grep ".jar" | awk '{ print $2}')
+    java_process_names=$(sudo ${JAVA_BIN}jps $OPTIONS | grep ".jar" | awk '{ print $2 }')
     for pname in ${java_process_names}
    {
         check_java_heap $pname
